@@ -11,7 +11,7 @@
   "autoload": {
     "psr-4": {
       "ImmoweltHH\\DependencyInjection\\": "src/",
-      "ImmoweltHH\\DependencyInjection\\Test": "test/"
+      "ImmoweltHH\\DependencyInjection\\Test\\": "test/"
     }
   }
 }
