@@ -1,0 +1,17 @@
+{
+  "name": "immowelt-hh/dependency-injection",
+  "license": "MIT",
+  "description": "Simple DI",
+  "authors": [
+    {
+      "name": "Maximilian Ratz",
+      "email": "maximilian.ratz@immonet.de"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "ImmoweltHH\\DependencyInjection\\": "src/",
+      "ImmoweltHH\\DependencyInjection\\Test": "test/"
+    }
+  }
+}
