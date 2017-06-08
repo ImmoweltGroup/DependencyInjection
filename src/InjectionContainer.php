@@ -25,9 +25,9 @@ class InjectionContainer
     /** @var bool */
     private $debug;
 
-    public function __construct()
+    public function __construct($debug = false)
     {
-        $this->debug = false;
+        $this->debug = $debug;
         $this->circularReferenceCache = [];
         $this->dependencyTree = new DependencyTree();
     }
