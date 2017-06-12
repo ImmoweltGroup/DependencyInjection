@@ -139,9 +139,21 @@ class InjectionContainer
      * @param ReflectionParameter $param
      *
      * @return ReflectionClass
+     * @throws DependencyInjectionException
      */
     private function getClass(ReflectionParameter $param)
     {
+        if ($param->getClass() === null) {
+            throw new DependencyInjectionException(
+                sprintf(
+                    "Parameter %d ('%s') in %s cannot be instanciated",
+                    $param->getPosition(),
+                    $param->getName(),
+                    $param->getDeclaringClass()->getName()
+                )
+            );
+        }
+
         return $param->getClass();
     }
 
