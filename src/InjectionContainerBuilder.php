@@ -19,8 +19,8 @@ class InjectionContainerBuilder
     /**
      * @return InjectionContainerBuilder
      */
-    public function debug() {
-        $this->container->setDebug(true);
+    public function debug($value) {
+        $this->container->setDebug($value);
         return $this;
     }
 
