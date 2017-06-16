@@ -137,6 +137,7 @@ class InjectionContainer
 
     /**
      * @param ReflectionParameter $param
+     * TODO: add test for null-check
      *
      * @return ReflectionClass
      * @throws DependencyInjectionException
@@ -161,10 +162,9 @@ class InjectionContainer
      * @param ReflectionClass $class
      */
     private function checkForCircularReference(ReflectionClass $class) {
-
-        if (!$this->dependencyTree->treeContains($class->getName())) {
-            $this->dependencyTree->addNode($class->getName());
-        } else {
+        $alreadyInTree = $this->dependencyTree->treeContains($class->getName());
+        $this->dependencyTree->addNode($class->getName());
+        if ($alreadyInTree) {
             $this->handleCircularReference();
         }
     }
@@ -174,7 +174,7 @@ class InjectionContainer
      */
     private function handleCircularReference() {
         $message = sprintf(
-            "The following classing are having circular referencing: %s",
+            "The following classes are having circular referencing: %s",
             $this->dependencyTree->toString()
         );
         throw new CircularReferenceException($message);
