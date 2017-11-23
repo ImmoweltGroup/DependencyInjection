@@ -2,6 +2,7 @@
 
 namespace ImmoweltHH\Test\DependencyInjection\Fixtures;
 
+use DateTimeInterface;
 use ImmoweltHH\DependencyInjection\InjectionConfig;
 use ImmoweltHH\Test\DependencyInjection\Fixtures\NoDependencies\ClassANoConstructor;
 
@@ -27,7 +28,10 @@ class TestInjectionConfig implements InjectionConfig
      */
     public function interfaces()
     {
-        return [];
+        return [
+            LoggerInterface::class => LoggerImpl::class,
+            DateTimeInterface::class => LoggerImpl::class
+        ];
     }
 
     /**

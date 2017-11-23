@@ -4,9 +4,11 @@ namespace ImmoweltHH\Test\DependencyInjection\Tests;
 
 use ImmoweltHH\DependencyInjection\Exception\DependencyInjectionException;
 use ImmoweltHH\DependencyInjection\InjectionContainer;
+use ImmoweltHH\Test\DependencyInjection\Fixtures\HasDependencies\ClassWithConfiguredInterfaceDependencyA;
+use ImmoweltHH\Test\DependencyInjection\Fixtures\HasDependencies\ClassWithConfiguredInterfaceDependencyB;
+use ImmoweltHH\Test\DependencyInjection\Fixtures\HasDependencies\ClassWithNonConfiguredInterfaceDependency;
 use ImmoweltHH\Test\DependencyInjection\Fixtures\TestInjectionConfig;
 use PHPUnit_Framework_TestCase;
-use ReflectionProperty;
 use ImmoweltHH\Test\DependencyInjection\Fixtures\HasDependencies\ClassAWithDependencies;
 use ImmoweltHH\Test\DependencyInjection\Fixtures\HasDependencies\ClassBHasA;
 use ImmoweltHH\Test\DependencyInjection\Fixtures\HasDependencies\ClassCHasBAndA;
@@ -119,4 +121,32 @@ class InjectionContainerInstanciationTest extends PHPUnit_Framework_TestCase
         $this->setExpectedException(DependencyInjectionException::class);
         $this->objectUnderTest->getAliased("EmployeeController");
     }
+
+    /**
+     * @test
+     */
+    public function testInstancingByInterface()
+    {
+        $this->objectUnderTest->get(ClassWithConfiguredInterfaceDependencyA::class);
+    }
+
+    /**
+     * @test
+     */
+    public function testInstancingByNonConfiguredInterface()
+    {
+        $this->setExpectedException(DependencyInjectionException::class);
+        $this->objectUnderTest->get(ClassWithNonConfiguredInterfaceDependency::class);
+    }
+
+    /**
+     * @test
+     */
+    public function testInstancingByConfiguredInterfaceWhichDoesntImplement()
+    {
+        $this->setExpectedException(DependencyInjectionException::class);
+        $this->objectUnderTest->get(ClassWithConfiguredInterfaceDependencyB::class);
+    }
+
+
 }

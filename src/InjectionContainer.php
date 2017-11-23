@@ -35,7 +35,7 @@ class InjectionContainer
         $this->dependencyTree = new DependencyTree();
     }
 
-    public function importPreConfiguredClasses()
+    private function importPreConfiguredClasses()
     {
         foreach ($this->config->preconfiguredClasses() as $preconfiguredClass) {
             $name = (new ReflectionClass($preconfiguredClass))->getName();
@@ -117,15 +117,14 @@ class InjectionContainer
      */
     private function getClass(ReflectionParameter $param)
     {
-        if ($param->getClass() === null) {
-            throw new DependencyInjectionException(
-                sprintf(
-                    "Parameter %d ('%s') in %s cannot be instanciated",
-                    $param->getPosition(),
-                    $param->getName(),
-                    $param->getDeclaringClass()->getName()
-                )
-            );
+        $this->assertParamTypeIsSet($param);
+
+        if ($param->getClass()->isInterface()) {
+            $this->assertInterfaceIsConfigured($param);
+            $reflectionClass = new ReflectionClass($this->config->interfaces()[$param->getClass()->getName()]);
+            $this->assertConfiguredClassImplementsInterface($param, $reflectionClass);
+
+            return $reflectionClass;
         }
 
         return $param->getClass();
@@ -157,6 +156,64 @@ class InjectionContainer
     {
         if ($this->config->debug()) {
             echo $this->dependencyTree->toString() . PHP_EOL;
+        }
+    }
+
+    /**
+     * @param ReflectionParameter $param
+     *
+     * @throws DependencyInjectionException
+     */
+    private function assertParamTypeIsSet(ReflectionParameter $param)
+    {
+        if ($param->getClass() === null) {
+            throw new DependencyInjectionException(
+                sprintf(
+                    "Parameter %d ('%s') in %s cannot be instanciated (no type given)",
+                    $param->getPosition(),
+                    $param->getName(),
+                    $param->getDeclaringClass()->getName()
+                )
+            );
+        }
+    }
+
+    /**
+     * @param ReflectionParameter $param
+     *
+     * @throws DependencyInjectionException
+     */
+    private function assertInterfaceIsConfigured(ReflectionParameter $param)
+    {
+        if (!array_key_exists($param->getClass()->getName(), $this->config->interfaces())) {
+            throw new DependencyInjectionException(
+                sprintf(
+                    "Parameter %d ('%s') in %s cannot be instanciated (interface not configured)",
+                    $param->getPosition(),
+                    $param->getName(),
+                    $param->getDeclaringClass()->getName()
+                )
+            );
+        }
+    }
+
+    /**
+     * @param ReflectionParameter $param
+     * @param $reflectionClass
+     *
+     * @throws DependencyInjectionException
+     */
+    private function assertConfiguredClassImplementsInterface(ReflectionParameter $param, ReflectionClass $reflectionClass)
+    {
+        if (!$reflectionClass->implementsInterface($param->getClass()->getName())) {
+            throw new DependencyInjectionException(
+                sprintf(
+                    "Parameter %d ('%s') in %s cannot be instanciated (configured class does implement interface)",
+                    $param->getPosition(),
+                    $param->getName(),
+                    $param->getDeclaringClass()->getName()
+                )
+            );
         }
     }
 }
