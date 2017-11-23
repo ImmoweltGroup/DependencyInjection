@@ -4,6 +4,7 @@ namespace ImmoweltHH\Test\DependencyInjection\Tests;
 
 use ImmoweltHH\DependencyInjection\Exception\DependencyInjectionException;
 use ImmoweltHH\DependencyInjection\InjectionContainer;
+use ImmoweltHH\Test\DependencyInjection\Fixtures\TestInjectionConfig;
 use PHPUnit_Framework_TestCase;
 use ReflectionProperty;
 use ImmoweltHH\Test\DependencyInjection\Fixtures\HasDependencies\ClassAWithDependencies;
@@ -31,8 +32,7 @@ class InjectionContainerInstanciationTest extends PHPUnit_Framework_TestCase
         $this->preconfiguredClass = new PreconfiguredClass();
         $this->preconfiguredClass->configuredValue = "abc";
 
-        $this->objectUnderTest = new InjectionContainer();
-        $this->objectUnderTest->registerPreConfiguredClass($this->preconfiguredClass);
+        $this->objectUnderTest = new InjectionContainer(new TestInjectionConfig());
     }
 
     /**
@@ -105,10 +105,6 @@ class InjectionContainerInstanciationTest extends PHPUnit_Framework_TestCase
      */
     public function testInstancingViaGetAlias()
     {
-        $property = new ReflectionProperty(InjectionContainer::class, "aliases");
-        $property->setAccessible(true);
-        $property->setValue($this->objectUnderTest, ["AuctionInfoController" => ClassANoConstructor::class]);
-
         $result = $this->objectUnderTest->getAliased("AuctionInfoController");
 
         $this->assertThat($result, $this->isInstanceOf(ClassANoConstructor::class));
@@ -120,10 +116,6 @@ class InjectionContainerInstanciationTest extends PHPUnit_Framework_TestCase
      */
     public function expectExceptionWhenAliasDoesNotExist()
     {
-        $property = new ReflectionProperty(InjectionContainer::class, "aliases");
-        $property->setAccessible(true);
-        $property->setValue($this->objectUnderTest, ["AuctionInfoController" => ClassANoConstructor::class]);
-
         $this->setExpectedException(DependencyInjectionException::class);
         $this->objectUnderTest->getAliased("EmployeeController");
     }

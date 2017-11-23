@@ -5,6 +5,7 @@ namespace ImmoweltHH\Test\DependencyInjection\Tests;
 
 use ImmoweltHH\DependencyInjection\Exception\CircularReferenceException;
 use ImmoweltHH\DependencyInjection\InjectionContainer;
+use ImmoweltHH\Test\DependencyInjection\Fixtures\TestInjectionConfig;
 use PHPUnit_Framework_TestCase;
 use ImmoweltHH\Test\DependencyInjection\Fixtures\CircularReferences\ComplexAHasBAndC;
 use ImmoweltHH\Test\DependencyInjection\Fixtures\CircularReferences\SimpleA;
@@ -20,7 +21,7 @@ class InjectionContainerCircularReferencingTest extends PHPUnit_Framework_TestCa
      */
     public function setUp()
     {
-        $this->objectUnderTest = new InjectionContainer();
+        $this->objectUnderTest = new InjectionContainer(new TestInjectionConfig());
     }
 
     /**

@@ -10,9 +10,6 @@ use ReflectionParameter;
 class InjectionContainer
 {
 
-    /** @var string[] */
-    private $aliases = [];
-
     /** @var object[] */
     private $cache = [];
 
@@ -22,44 +19,28 @@ class InjectionContainer
     /** @var DependencyTree */
     private $dependencyTree;
 
-    /** @var bool */
-    private $debug;
+    /** @var InjectionConfig */
+    private $config;
 
-    public function __construct($debug = false)
+    /**
+     * InjectionContainer constructor.
+     *
+     * @param InjectionConfig $injectionConfig
+     */
+    public function __construct(InjectionConfig $injectionConfig)
     {
-        $this->debug = $debug;
+        $this->config = $injectionConfig;
+        $this->importPreConfiguredClasses();
         $this->circularReferenceCache = [];
         $this->dependencyTree = new DependencyTree();
     }
 
-    public static function builder() {
-        return new InjectionContainerBuilder(new InjectionContainer());
-    }
-
-    /**
-     * @param string $alias
-     * @param string $className
-     *
-     * @throws DependencyInjectionException
-     */
-    public function registerAlias($alias, $className)
+    public function importPreConfiguredClasses()
     {
-        if (!class_exists($className)) {
-            throw new DependencyInjectionException(
-                sprintf("Class '%s' does not exist", $className)
-            );
+        foreach ($this->config->preconfiguredClasses() as $preconfiguredClass) {
+            $name = (new ReflectionClass($preconfiguredClass))->getName();
+            $this->cache[$name] = $preconfiguredClass;
         }
-
-        $this->aliases[$alias] = $className;
-    }
-
-    /**
-     * @param object $object
-     */
-    public function registerPreConfiguredClass($object)
-    {
-        $name = (new ReflectionClass($object))->getName();
-        $this->cache[$name] = $object;
     }
 
     /**
@@ -69,7 +50,7 @@ class InjectionContainer
      */
     public function hasAlias($alias)
     {
-        return isset($this->aliases[$alias]);
+        return isset($this->config->aliases()[$alias]);
     }
 
     /**
@@ -81,7 +62,7 @@ class InjectionContainer
     public function getAliased($alias)
     {
         if ($this->hasAlias($alias)) {
-            return $this->get($this->aliases[$alias]);
+            return $this->get($this->config->aliases()[$alias]);
         }
 
         throw new DependencyInjectionException(sprintf("Alias '%s' not found", $alias));
@@ -125,14 +106,6 @@ class InjectionContainer
         $this->dependencyTree->killBottomNode();
 
         return $instance;
-    }
-
-    /**
-     * @param bool $value
-     */
-    public function setDebug($value)
-    {
-        $this->debug = $value;
     }
 
     /**
@@ -182,7 +155,7 @@ class InjectionContainer
 
     private function printCurrentPath()
     {
-        if ($this->debug) {
+        if ($this->config->debug()) {
             echo $this->dependencyTree->toString() . PHP_EOL;
         }
     }
