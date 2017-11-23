@@ -4,6 +4,7 @@ namespace ImmoweltHH\Test\DependencyInjection\Fixtures;
 
 use DateTimeInterface;
 use ImmoweltHH\DependencyInjection\InjectionConfig;
+use ImmoweltHH\DependencyInjection\InjectionContainer;
 use ImmoweltHH\Test\DependencyInjection\Fixtures\NoDependencies\ClassANoConstructor;
 
 class TestInjectionConfig implements InjectionConfig
@@ -38,9 +39,11 @@ class TestInjectionConfig implements InjectionConfig
      * Returns a list of objects that should be used for instanciation
      * instead of a clean object
      *
+     * @param InjectionContainer $container
+     *
      * @return object[]
      */
-    public function preconfiguredClasses()
+    public function preconfiguredClasses(InjectionContainer $container)
     {
         return [
             $this->preconfigureObject()

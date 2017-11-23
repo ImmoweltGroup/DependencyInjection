@@ -37,7 +37,7 @@ class InjectionContainer
 
     private function importPreConfiguredClasses()
     {
-        foreach ($this->config->preconfiguredClasses() as $preconfiguredClass) {
+        foreach ($this->config->preconfiguredClasses($this) as $preconfiguredClass) {
             $name = (new ReflectionClass($preconfiguredClass))->getName();
             $this->cache[$name] = $preconfiguredClass;
         }

@@ -22,9 +22,11 @@ interface InjectionConfig
      * Returns a list of objects that should be used for instanciation
      * instead of a clean object
      *
+     * @param InjectionContainer $container
+     *
      * @return object[]
      */
-    public function preconfiguredClasses();
+    public function preconfiguredClasses(InjectionContainer $container);
 
     /**
      * Return true to enable debug print
