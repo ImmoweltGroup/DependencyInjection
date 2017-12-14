@@ -205,13 +205,26 @@ class InjectionContainer
      */
     private function assertConfiguredClassImplementsInterface(ReflectionParameter $param, ReflectionClass $reflectionClass)
     {
-        if (!$reflectionClass->implementsInterface($param->getClass()->getName())) {
+        if ($param->getClass()->isAbstract() && !$reflectionClass->isSubclassOf($param->getClass()->getName())) {
             throw new DependencyInjectionException(
                 sprintf(
-                    "Parameter %d ('%s') in %s cannot be instanciated (configured class does implement interface)",
+                    "Parameter %d ('%s') in %s cannot be instanciated (configured class %s does not extend %s)",
                     $param->getPosition(),
                     $param->getName(),
-                    $param->getDeclaringClass()->getName()
+                    $param->getDeclaringClass()->getName(),
+                    $reflectionClass->getName(),
+                    $param->getClass()->getName()
+                )
+            );
+        } else if (!$reflectionClass->implementsInterface($param->getClass()->getName())) {
+            throw new DependencyInjectionException(
+                sprintf(
+                    "Parameter %d ('%s') in %s cannot be instanciated (configured class %s does not implement %s)",
+                    $param->getPosition(),
+                    $param->getName(),
+                    $param->getDeclaringClass()->getName(),
+                    $reflectionClass->getName(),
+                    $param->getClass()->getName()
                 )
             );
         }
