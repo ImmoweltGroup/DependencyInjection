@@ -119,7 +119,7 @@ class InjectionContainer
     {
         $this->assertParamTypeIsSet($param);
 
-        if ($param->getClass()->isInterface()) {
+        if ($param->getClass()->isInterface() || $param->getClass()->isAbstract()) {
             $this->assertInterfaceIsConfigured($param);
             $reflectionClass = new ReflectionClass($this->config->interfaces()[$param->getClass()->getName()]);
             $this->assertConfiguredClassImplementsInterface($param, $reflectionClass);
@@ -201,6 +201,8 @@ class InjectionContainer
      * @param ReflectionParameter $param
      * @param $reflectionClass
      *
+     * TODO: adjust tests for abstract classes
+     *
      * @throws DependencyInjectionException
      */
     private function assertConfiguredClassImplementsInterface(ReflectionParameter $param, ReflectionClass $reflectionClass)
@@ -216,7 +218,7 @@ class InjectionContainer
                     $param->getClass()->getName()
                 )
             );
-        } else if (!$reflectionClass->implementsInterface($param->getClass()->getName())) {
+        } else if ($param->getClass()->isInterface() && !$reflectionClass->implementsInterface($param->getClass()->getName())) {
             throw new DependencyInjectionException(
                 sprintf(
                     "Parameter %d ('%s') in %s cannot be instanciated (configured class %s does not implement %s)",
